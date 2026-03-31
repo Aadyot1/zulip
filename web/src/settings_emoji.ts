@@ -62,6 +62,13 @@ export function reset(): void {
 }
 
 function sort_author_full_name(a: ServerEmoji, b: ServerEmoji): number {
+    // The current user's emoji always sort to the top.
+    const a_is_mine = a.author_id !== null && people.is_my_user_id(a.author_id);
+    const b_is_mine = b.author_id !== null && people.is_my_user_id(b.author_id);
+    if (a_is_mine !== b_is_mine) {
+        return a_is_mine ? -1 : 1;
+    }
+
     const author_a = a.author?.full_name;
     const author_b = b.author?.full_name;
 
@@ -145,7 +152,7 @@ export function populate_emoji(): void {
             author_full_name: sort_author_full_name,
             ...ListWidget.generic_sort_functions("alphabetic", ["name"]),
         },
-        init_sort: "name_alphabetic",
+        init_sort: "author_full_name",
         $simplebar_container: $("#emoji-settings .progressive-table-wrapper"),
     });
 
